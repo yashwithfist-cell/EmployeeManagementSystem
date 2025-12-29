@@ -1,0 +1,6 @@
+package com.pmtool.backend.enums;
+
+public enum LeaveStatus {
+    PENDING, APPROVED, REJECTED, APPROVED_BY_TEAM_LEAD,APPROVED_BY_PROJECT_MANAGER,APPROVED_BY_HUMAN_RESOURCE
+
+}

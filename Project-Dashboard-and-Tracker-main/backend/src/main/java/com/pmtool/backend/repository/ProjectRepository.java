@@ -1,0 +1,32 @@
+package com.pmtool.backend.repository;
+
+import com.pmtool.backend.DTO.ProjectResponseDTO;
+import com.pmtool.backend.entity.Discipline;
+import com.pmtool.backend.entity.Project;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ProjectRepository extends JpaRepository<Project, Long> {
+
+	@Query("SELECT d FROM Discipline d WHERE d.project.id = :projectId")
+	List<Discipline> findDisciplinesByProjectId(@Param("projectId") Long projectId);
+
+	@Query("SELECT new com.pmtool.backend.DTO.ProjectResponseDTO( p.id, p.name, p.clientName,SUM(w.hoursWorked), p.employee.employeeId) FROM WorkLogEntry w RIGHT JOIN w.project p GROUP BY p.id,p.name,p.clientName, p.employee.employeeId ORDER BY p.name")
+	List<ProjectResponseDTO> findAllWithHoursConsumed();
+
+	@Query("SELECT p FROM Project p WHERE p.employee.username = :username")
+	List<Project> findAllByUserName(@Param("username") String username);
+
+	@Query("""
+			  SELECT DISTINCT p
+			  FROM Project p
+			  LEFT JOIN FETCH p.assignments pa
+			  WHERE pa.employee.username = :username
+			""")
+	List<Project> findAllProjectsByTeamLead(@Param("username") String username);
+}

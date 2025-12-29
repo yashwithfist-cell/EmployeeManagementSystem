@@ -1,0 +1,77 @@
+package com.pmtool.backend.DTO;
+
+import java.time.LocalDate;
+
+import com.pmtool.backend.entity.Milestone;
+
+public class MilestoneResponseDTO {
+
+	private Long milestoneId;
+	private String milestoneName;
+
+	public void setMilestoneId(Long milestoneId) {
+		this.milestoneId = milestoneId;
+	}
+
+	private String projectName;
+	private LocalDate dueDate;
+	private Double hoursConsumed;
+
+	public void setMilestoneName(String milestoneName) {
+		this.milestoneName = milestoneName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+
+	public void setDueDate(LocalDate dueDate) {
+		this.dueDate = dueDate;
+	}
+
+	public void setHoursConsumed(Double hoursConsumed) {
+		this.hoursConsumed = hoursConsumed;
+	}
+
+	public Long getMilestoneId() {
+		return this.milestoneId;
+	}
+
+	public String getMilestoneName() {
+		return this.milestoneName;
+	}
+
+	public String getProjectName() {
+		return this.projectName;
+	}
+
+	public LocalDate getDueDate() {
+		return this.dueDate;
+	}
+
+	public Double getHoursConsumed() {
+		return this.hoursConsumed;
+	}
+
+	public MilestoneResponseDTO(Long milestoneId, String milestoneName, String projectName, LocalDate dueDate,
+			Double hoursConsumed) {
+		this.milestoneId = milestoneId;
+		this.milestoneName = milestoneName;
+		this.projectName = projectName;
+		this.dueDate = dueDate;
+		this.hoursConsumed = Double.valueOf((hoursConsumed != null) ? hoursConsumed.doubleValue() : 0.0D);
+	}
+
+	public MilestoneResponseDTO(Milestone milestone) {
+		this.milestoneId = milestone.getId();
+		this.milestoneName = milestone.getName();
+		this.dueDate = milestone.getDueDate();
+
+		if (milestone.getProject() != null) {
+			this.projectName = milestone.getProject().getName();
+		}
+
+		this.hoursConsumed = Double.valueOf(0.0D);
+	}
+
+}
