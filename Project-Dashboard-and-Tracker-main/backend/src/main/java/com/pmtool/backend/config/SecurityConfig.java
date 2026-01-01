@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/notifications/**").hasAnyRole("EMPLOYEE", "SYSTEM_ADMIN","PROJECT_MANAGER","TEAM_LEAD","HUMAN_RESOURCE")
                         
                         // --- Admin-Only Endpoints for Management ---
-                        .requestMatchers("/api/employees/**").hasAnyRole("SYSTEM_ADMIN","HUMAN_RESOURCE","PROJECT_MANAGER","TEAM_LEAD")
+                        .requestMatchers("/api/employees/**").hasAnyRole("SYSTEM_ADMIN","HUMAN_RESOURCE","PROJECT_MANAGER","TEAM_LEAD", "EMPLOYEE")
                         .requestMatchers("/api/departments/**").hasAnyRole("SYSTEM_ADMIN","HUMAN_RESOURCE")
                         .requestMatchers("/api/reports/**").hasRole("SYSTEM_ADMIN")
                         .requestMatchers("/api/dashboard/**").hasAnyRole("SYSTEM_ADMIN","HUMAN_RESOURCE")

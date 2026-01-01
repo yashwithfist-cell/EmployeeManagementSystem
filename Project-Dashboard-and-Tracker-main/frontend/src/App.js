@@ -27,6 +27,7 @@ import EmpNotification from "./employee/EmpNotification.jsx";
 import MgrProjAssignment from "./projectmanager/MgrProjAssignment.jsx";
 import EmpProjAssignment from "./employee/EmpProjAssignment.jsx";
 import MgrProjects from "./projectmanager/MgrProjects.jsx";
+import EmpProfile from "./employee/EmpProfile.jsx";
 
 
 // 🔒 NEW — Protected Route for Multi-User
@@ -102,6 +103,7 @@ function AppContent() {
             </RequireAuth>
           }
         >
+          <Route path="/empprofile" element={<EmpProfile />} />
           <Route path="/employeedashboard" element={<EmployeeDashboard />} />
           <Route path="/employeeleave" element={<EmployeeLeave />} />
           <Route path="/empattendancelog" element={<EmpAttendanceLog />} />

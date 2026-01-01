@@ -26,7 +26,7 @@ export default function LeaveTable({ leaves, onAction }) {
         <thead>
           <tr className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-left">
             <th className="p-3 text-center font-semibold rounded-tl-xl">ID</th>
-            <th className="p-3 text-center font-semibold">Employee</th>
+            {role != "EMPLOYEE" && <th className="p-3 text-center font-semibold">Employee</th>}
             <th className="p-3 text-center font-semibold">Leave Type</th>
             <th className="p-3 text-center font-semibold">Dates</th>
             <th className="p-3 text-center font-semibold">Leave Days</th>
@@ -46,7 +46,7 @@ export default function LeaveTable({ leaves, onAction }) {
                 } hover:bg-blue-50`}
             >
               <td className="p-3 text-center font-medium text-gray-800">{leave.id}</td>
-              <td className="p-3 text-center">{leave.username}</td>
+              {role != "EMPLOYEE" && <td className="p-3 text-center">{leave.username}</td>}
               <td className="p-3 text-center capitalize">{leave.leaveType?.toLowerCase() || "-"}</td>
               <td className="p-3 text-center text-gray-600">
                 {leave.startDate} → {leave.endDate}

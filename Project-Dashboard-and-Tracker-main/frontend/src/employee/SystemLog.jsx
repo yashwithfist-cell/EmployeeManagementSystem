@@ -48,6 +48,9 @@ export default function SystemLog() {
 
   const totalPages = Math.ceil(data.length / recordsPerPage);
 
+  const presentMs = 28800000;
+  const halfPresntMs = 14400000;
+
   const handlePrev = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
@@ -393,7 +396,8 @@ export default function SystemLog() {
                   <th className="p-2">Meeting Time</th>
                   <th className="p-2">Event Time</th>
                   <th className="p-2">Training Time</th>
-                  <th className="p-2">Total Time</th>
+                  {/* <th className="p-2">Total Time</th> */}
+                  <th className="p-2">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -415,11 +419,16 @@ export default function SystemLog() {
                       <td className="p-2 text-purple-600 font-bold">{formatTime(log.totalMeetingMs)}</td>
                       <td className="p-2 text-indigo-600 font-bold">{formatTime(log.totalEventMs)}</td>
                       <td className="p-2 text-orange-600 font-bold">{formatTime(log.totalTrainingMs)}</td>
-                      <td className="p-2 text-blue-600 font-bold">
+                      {/* <td className="p-2 text-blue-600 font-bold">
                         {formatTime(
-                          log.totalWorkMs - log.totalBreakMs + (log.totalMeetingMs || 0) + (log.totalEventMs || 0)
+                          Math.max(
+                            0,
+                            log.totalWorkMs -
+                            log.totalBreakMs
+                          )
                         )}
-                      </td>
+                      </td> */}
+                      <td className="p-2 text-orange-600 font-bold">{presentMs <= log.totalWorkMs ? "FULL DAY" : (presentMs >= log.totalWorkMs && halfPresntMs <= log.totalWorkMs) ? "HALF DAY" : "ABSENT"}</td>
                     </tr>
                   ))
                 )}

@@ -8,6 +8,7 @@ import com.pmtool.backend.entity.Discipline;
 import com.pmtool.backend.entity.Milestone;
 import com.pmtool.backend.entity.ProjectAssignment;
 import com.pmtool.backend.enums.AssignmentStatus;
+import com.pmtool.backend.enums.TaskStatus;
 
 import lombok.Builder;
 import lombok.Data;
@@ -28,15 +29,18 @@ public class ProjectAssignmentResponse {
 	private LocalDateTime lastStartedAt;
 	private boolean timerRunning;
 	private String department;
+	private TaskStatus taskStatus;
+	private String headComment;
+	private Boolean finalized;
 
 	public static ProjectAssignmentResponse fromEntity(ProjectAssignment pa) {
 		return ProjectAssignmentResponse.builder().id(pa.getProjAssignId())
 				.employeeName(pa.getEmployee() != null ? pa.getEmployee().getName() : null)
 				.projectName(pa.getProject() != null ? pa.getProject().getName() : null).startDate(pa.getStartDate())
-				.dueDate(pa.getDueDate()).status(pa.getStatus())
-				.milestoneName(pa.getMilestone().getName())
-				.disciplineName(pa.getDiscipline().getName())
-				.comment(pa.getComment()).totalWorkedSeconds(pa.getTotalWorkedSeconds())
-				.timerRunning(pa.isTimerRunning()).department(pa.getEmployee().getDepartment().getName()).build();
+				.dueDate(pa.getDueDate()).status(pa.getStatus()).milestoneName(pa.getMilestone().getName())
+				.disciplineName(pa.getDiscipline().getName()).comment(pa.getComment())
+				.totalWorkedSeconds(pa.getTotalWorkedSeconds()).timerRunning(pa.isTimerRunning())
+				.department(pa.getEmployee().getDepartment().getName()).taskStatus(pa.getHeadStatus())
+				.headComment(pa.getHeadComment()).finalized(pa.getFinalized()).build();
 	}
 }

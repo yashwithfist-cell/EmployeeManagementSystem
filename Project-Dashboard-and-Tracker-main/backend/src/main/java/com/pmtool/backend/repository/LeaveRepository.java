@@ -17,7 +17,7 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
 			    SELECT SUM(l.unPaidLeave)
 			    FROM Leave l
 			    WHERE l.employee.username = :username
-			      AND l.status = 'APPROVED_BY_SYSTEM_ADMIN'
+			      AND l.status = 'APPROVED_BY_HUMAN_RESOURCE'
 			      AND l.startDate BETWEEN :startDate AND :endDate
 			      AND l.endDate BETWEEN :startDate AND :endDate
 			""")
@@ -29,7 +29,7 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
 			    FROM Leave l
 			    WHERE l.employee.username = :username
 			      AND l.leaveType = 'EARNED'
-			      AND l.status = 'APPROVED_BY_SYSTEM_ADMIN'
+			      AND l.status = 'APPROVED_BY_HUMAN_RESOURCE'
 			      AND l.startDate BETWEEN :startOfYear AND :endOfYear
 			      AND l.endDate BETWEEN :startOfYear AND :endOfYear
 			""")
@@ -41,7 +41,7 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
 			    FROM Leave l
 			    WHERE l.employee.username = :username
 			      AND l.leaveType = 'CASUAL'
-			      AND l.status = 'APPROVED_BY_SYSTEM_ADMIN'
+			      AND l.status = 'APPROVED_BY_HUMAN_RESOURCE'
 			      AND l.startDate BETWEEN :startOfYear AND :endOfYear
 			      AND l.endDate BETWEEN :startOfYear AND :endOfYear
 			""")
@@ -74,7 +74,7 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
 	@Query("""
 		    SELECT COALESCE(SUM(l.days), 0.0)
 		    FROM Leave l
-		    WHERE l.employee.username = :username AND status='APPROVED_BY_SYSTEM_ADMIN' AND l.leaveType = 'CASUAL'
+		    WHERE l.employee.username = :username AND status='APPROVED_BY_HUMAN_RESOURCE' AND l.leaveType = 'CASUAL'
 		      AND l.startDate <= :endDate
 		      AND l.endDate >= :startDate
 		""")

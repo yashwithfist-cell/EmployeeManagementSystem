@@ -8,6 +8,9 @@ export default function SA_SystemLogAdmin() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const presentMs = 28800000;
+  const halfPresntMs = 14400000;
+
   const formatTime = (ms) => {
     const sec = Math.floor(ms / 1000);
     const h = Math.floor(sec / 3600);
@@ -87,7 +90,8 @@ export default function SA_SystemLogAdmin() {
                 <th className="p-2">Break Time</th>
                 <th className="p-2">Meeting Time</th>
                 <th className="p-2">Event Time</th>
-                <th className="p-2">Total Time</th>
+                {/* <th className="p-2">Total Time</th> */}
+                <th className="p-2">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -108,9 +112,16 @@ export default function SA_SystemLogAdmin() {
                     <td className="p-2 text-yellow-600 font-bold">{formatTime(log.totalBreakMs)}</td>
                     <td className="p-2 text-blue-600 font-bold">{formatTime(log.totalMeetingMs)}</td>
                     <td className="p-2 text-blue-600 font-bold">{formatTime(log.totalEventMs)}</td>
-                    <td className="p-2 text-blue-600 font-bold">
-                      {formatTime(log.totalWorkMs - log.totalBreakMs)}
-                    </td>
+                    {/* <td className="p-2 text-blue-600 font-bold">
+                      {formatTime(
+                        Math.max(
+                          0,
+                          log.totalWorkMs -
+                          log.totalBreakMs
+                        )
+                      )}
+                    </td> */}
+                    <td className="p-2 text-orange-600 font-bold">{presentMs <= log.totalWorkMs ? "FULL DAY" : (presentMs >= log.totalWorkMs && halfPresntMs <= log.totalWorkMs) ? "HALF DAY" : "ABSENT"}</td>
                   </tr>
                 ))
               )}

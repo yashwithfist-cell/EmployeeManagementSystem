@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pmtool.backend.DTO.DisciplineDTO;
 import com.pmtool.backend.DTO.MilestoneDTO;
+import com.pmtool.backend.DTO.request.HeadActionRequest;
 import com.pmtool.backend.DTO.request.ProjectAssignmentRequest;
 import com.pmtool.backend.DTO.response.ApiResponse;
 import com.pmtool.backend.DTO.response.ProjectAssignmentResponse;
+import com.pmtool.backend.enums.TaskStatus;
 import com.pmtool.backend.services.ProjectAssignmentService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -138,6 +140,16 @@ public class ProjectAssignmentController {
 	public ResponseEntity<ApiResponse> stopTimer(@PathVariable Long id, HttpServletRequest request) {
 		ProjectAssignmentResponse updated = assignmentService.stopTimer(id);
 		return ResponseEntity.ok(ApiResponse.success(updated, "stop time updated", request.getRequestURI()));
+	}
+
+	@PatchMapping("/updateHeadStatus/{id}")
+	@PreAuthorize("hasAnyRole('PROJECT_MANAGER','TEAM_LEAD')")
+	public ResponseEntity<ApiResponse> updateHeadStatus(@PathVariable Long id,
+			@RequestBody HeadActionRequest requestBody, HttpServletRequest request) {
+		ProjectAssignmentResponse assignment = assignmentService.updateHeadStatus(id, requestBody.getTaskStatus(),
+				requestBody.getHeadComment());
+		return ResponseEntity
+				.ok(ApiResponse.success(assignment, "Assignment status updated successfully", request.getRequestURI()));
 	}
 
 }

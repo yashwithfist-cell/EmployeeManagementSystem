@@ -24,7 +24,7 @@ function Home() {
     } else if (role === "TEAM_LEAD") {
       navigate("/saleaveapproval", { replace: true });
     } else if (role === "EMPLOYEE") {
-      navigate("/employeedashboard", { replace: true });
+      navigate("/empprofile", { replace: true });
     } else {
       console.log("Unknown role:", role);
       navigate("/", { replace: true });

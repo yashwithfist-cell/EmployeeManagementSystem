@@ -1,17 +1,18 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaBars, FaTimes, FaClipboardList, FaCalendarAlt, FaClock, FaFileInvoice, FaChartLine,FaBell,FaTasks} from "react-icons/fa";
+import { FaBars, FaTimes, FaClipboardList, FaCalendarAlt, FaClock, FaFileInvoice, FaChartLine,FaBell,FaTasks, FaUserCircle} from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { useEffect } from "react";
 
 const navItems = [
-  { label: "Worklog", path: "/employeedashboard", icon: <FaClipboardList /> },
-  { label: "Leaves", path: "/employeeleave", icon: <FaCalendarAlt /> },
-  { label: "Attendance Log", path: "/empattendancelog", icon: <FaClock /> },
-  { label: "Salary Slip", path: "/empsalaryslip", icon: <FaFileInvoice /> },
-  { label: "SystemLog", path: "/empsystemlog", icon: <FaChartLine className="text-green-600 hover:scale-110 duration-200" /> },
+  { label: "Profile", path: "/empprofile", icon: <FaUserCircle className="text-blue-600 hover:scale-110 duration-200" /> },
+  { label: "Worklog", path: "/employeedashboard", icon: <FaClipboardList className="text-violet-600 hover:scale-110 duration-200" /> },
+  { label: "Leaves", path: "/employeeleave", icon: <FaCalendarAlt className="text-green-600 hover:scale-110 duration-200" /> },
+  { label: "Attendance Log", path: "/empattendancelog", icon: <FaClock className="text-orange-600 hover:scale-110 duration-200" /> },
+  { label: "Salary Slip", path: "/empsalaryslip", icon: <FaFileInvoice className="text-indigo-600 hover:scale-110 duration-200" /> },
+  { label: "SystemLog", path: "/empsystemlog", icon: <FaChartLine className="text-teal-600 hover:scale-110 duration-200" /> },
   { label: "Notifications", path: "/empnotification", icon: <FaBell className="text-yellow-500 hover:scale-110 duration-200" /> },
-  { label: "Tasks", path: "/empprojassignment", icon: <FaTasks className="text-blue-600 hover:scale-110 duration-200" /> }
+  { label: "Tasks", path: "/empprojassignment", icon: <FaTasks className="text-pink-600 hover:scale-110 duration-200" /> }
 ];
 
 export default function Sidebar({ isCollapsed, setIsCollapsed }) {
@@ -61,9 +62,9 @@ useEffect(() => {
           />
           <span className="absolute -bottom-2 right-0 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></span>
         </div>
-        <h1 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-500 tracking-wide text-center">
+        {/* <h1 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-500 tracking-wide text-center">
           Employee Dashboard
-        </h1>
+        </h1> */}
        
       </div>
 

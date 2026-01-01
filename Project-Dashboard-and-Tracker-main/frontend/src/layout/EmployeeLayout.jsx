@@ -26,7 +26,7 @@ const EmployeeLayout = () => {
         {/* Header */}
         <header className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg p-4 flex justify-between items-center">
           <div className="flex flex-col">
-            <h1 className="text-2xl font-extrabold tracking-wide">Employee Portal</h1>
+            <h1 className="text-2xl font-extrabold tracking-wide">Employee Dashboard</h1>
             <span className="text-sm text-white/80 mt-1">
               Welcome, <span className="font-semibold">{username}</span>!
             </span>

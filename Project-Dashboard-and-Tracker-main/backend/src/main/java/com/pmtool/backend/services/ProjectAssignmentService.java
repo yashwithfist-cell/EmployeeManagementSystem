@@ -10,6 +10,7 @@ import com.pmtool.backend.DTO.request.ProjectAssignmentRequest;
 import com.pmtool.backend.DTO.response.ProjectAssignmentResponse;
 import com.pmtool.backend.entity.ProjectAssignment;
 import com.pmtool.backend.enums.AssignmentStatus;
+import com.pmtool.backend.enums.TaskStatus;
 
 public interface ProjectAssignmentService {
 
@@ -39,4 +40,6 @@ public interface ProjectAssignmentService {
 	public ProjectAssignmentResponse pauseTimer(Long id);
 
 	public ProjectAssignmentResponse stopTimer(Long id);
+
+	public ProjectAssignmentResponse updateHeadStatus(Long id, TaskStatus status, String comment);
 }

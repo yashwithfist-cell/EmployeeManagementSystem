@@ -69,8 +69,7 @@ public class LeaveServiceImpl implements LeaveService {
 		List<Leave> leaveList = leaveRepository.findAllLeaveDates(userName, leaveDto.getStartDate(),
 				leaveDto.getEndDate());
 		List<LeaveDto> leaveDtoList = leaveList.stream().map(leave -> mapper.convertToLeaveDto(leave)).toList();
-		double leaveDays = AttendanceUtils.calculateLeaveDays(leaveDtoList, leaveDto.getStartDate(),
-				leaveDto.getEndDate(), holidayList);
+		double leaveDays = AttendanceUtils.calculateLeaveDays(leaveDtoList, leaveDto, holidayList);
 		if (leaveDto.getLeaveType() == LeaveType.CASUAL) {
 			if (leaveDays == 1) {
 				LocalDate monthStart = YearMonth.from(leaveDto.getStartDate()).atDay(1);
@@ -228,8 +227,27 @@ public class LeaveServiceImpl implements LeaveService {
 		LocalDate today = LocalDate.now();
 
 		// ================== PAID LEAVE ==================
-		long monthsWorked = ChronoUnit.MONTHS.between(joiningDate, today);
-		double earnedPaidLeave = monthsWorked * 1.25;
+		long monthsWorked = 0;
+		double earnedPaidLeave = 0;
+		if (joiningDate.getYear() == today.getYear()) {
+			monthsWorked = countMonths(joiningDate, today);
+			earnedPaidLeave = monthsWorked * 1.25;
+		} else {
+			int year = joiningDate.getYear();
+			monthsWorked = countMonths(joiningDate, LocalDate.of(year, 12, 31));
+			earnedPaidLeave = monthsWorked * 1.25;
+			year += 1;
+			while (year < today.getYear()) {
+				monthsWorked = countMonths(LocalDate.of(year, 01, 31), LocalDate.of(year, 12, 31));
+				earnedPaidLeave = earnedPaidLeave + monthsWorked * 1.25;
+				if (earnedPaidLeave > 15) {
+					earnedPaidLeave = 15;
+				}
+				year++;
+			}
+			monthsWorked = countMonths(LocalDate.of(year, 01, 31), today);
+			earnedPaidLeave = earnedPaidLeave + monthsWorked * 1.25;
+		}
 
 		double usedPaidLeave = leaveRepository.sumPaidLeaveByUsername(userName, professionalDate.plusDays(1), endOfYear)
 				.orElse(0.0);
@@ -277,6 +295,13 @@ public class LeaveServiceImpl implements LeaveService {
 		}
 		leaveDto.setUnPaidLeave(unPaidLeave);
 		return leaveDto;
+	}
+
+	private static long countMonths(LocalDate start, LocalDate end) {
+		if (end.isBefore(start))
+			return 0;
+
+		return ChronoUnit.MONTHS.between(start.withDayOfMonth(1), end.plusMonths(1).withDayOfMonth(1));
 	}
 
 	private Notification convertToNotification(Employee head, Employee employee) {

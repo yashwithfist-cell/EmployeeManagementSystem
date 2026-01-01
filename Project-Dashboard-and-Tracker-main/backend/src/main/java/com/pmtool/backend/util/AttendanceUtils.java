@@ -7,10 +7,13 @@ import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.pmtool.backend.DTO.AttendanceLogDto;
 import com.pmtool.backend.DTO.LeaveDto;
 import com.pmtool.backend.entity.Holiday;
+import com.pmtool.backend.enums.LeaveType;
 import com.pmtool.backend.exception.LeaveNotAllowedException;
 import com.pmtool.backend.exception.LeaveNotFoundException;
 
@@ -32,48 +35,56 @@ public class AttendanceUtils {
 		return String.format("%02d:%02d:%02d", hours, minutes, seconds);
 	}
 
-	public static long calculateLeaveDays(List<LeaveDto> leaveDtoList, LocalDate start, LocalDate end,
-			List<LocalDate> holidayList) {
+	public static long calculateLeaveDays(List<LeaveDto> leaveDtoList, LeaveDto leaveDto, List<LocalDate> holidayList) {
+		LocalDate start = leaveDto.getStartDate();
+		LocalDate end = leaveDto.getEndDate();
 		long leaveCount = 0;
-		List<LocalDate> startDateList = leaveDtoList.stream().map(leave -> leave.getStartDate()).toList();
-		List<LocalDate> endDateList = leaveDtoList.stream().map(leave -> leave.getEndDate()).toList();
-		for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
-			LocalDate loopDate = date;
-			if (startDateList.contains(loopDate) || endDateList.contains(loopDate)) {
-				throw new LeaveNotFoundException(
-						"Duplicate leave dates present please check startdate and enddate !!!");
-			}
-			if (holidayList.contains(date))
-				continue;
+		Set<LocalDate> startDateSet = leaveDtoList.stream()
+		        .map(LeaveDto::getStartDate)
+		        .collect(Collectors.toSet());
 
-			DayOfWeek day = date.getDayOfWeek();
-			// Skip Sundays
-			if (day == DayOfWeek.SUNDAY)
-				continue;
-
-			// Mondays to Fridays: always count
-			if (day != DayOfWeek.SATURDAY) {
+		Set<LocalDate> endDateSet = leaveDtoList.stream()
+				.map(LeaveDto::getEndDate).collect(Collectors.toSet());
+		if (leaveDto.getLeaveType().equals(LeaveType.EARNED)) {
+			for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
 				leaveCount++;
-				continue;
 			}
-
-			// Saturdays: count only if consecutive leave started today or yesterday was
-			// leave
-			if (day == DayOfWeek.SATURDAY) {
-				int dayOfMonth = date.getDayOfMonth();
-				int saturdayNumber = ((dayOfMonth - 1) / 7) + 1;
-				if (saturdayNumber == 2 || saturdayNumber == 4) {
+		} else {
+			for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+				LocalDate loopDate = date;
+				if (startDateSet.contains(loopDate) || endDateSet.contains(loopDate)) {
+					throw new LeaveNotFoundException(
+							"Duplicate leave dates present please check startdate and enddate !!!");
+				}
+				if (holidayList.contains(date))
 					continue;
-				} else {
+
+				DayOfWeek day = date.getDayOfWeek();
+				if (day == DayOfWeek.SUNDAY)
+					continue;
+
+				if (day != DayOfWeek.SATURDAY) {
 					leaveCount++;
+					continue;
+				}
+
+				if (day == DayOfWeek.SATURDAY) {
+					int dayOfMonth = date.getDayOfMonth();
+					int saturdayNumber = ((dayOfMonth - 1) / 7) + 1;
+					if (saturdayNumber == 2 || saturdayNumber == 4) {
+						continue;
+					} else {
+						leaveCount++;
+					}
 				}
 			}
 		}
+
 		if (leaveCount == 0) {
 			throw new LeaveNotAllowedException("Selected Dates are Holidays");
 		}
 
-			return leaveCount;
+		return leaveCount;
 	}
 
 }

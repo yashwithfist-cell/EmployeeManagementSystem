@@ -8,10 +8,26 @@ export default function EmpSalarySlip() {
   const [error, setError] = useState("");
 
   // Get today's date in YYYY-MM format
+  // const today = new Date();
+  // const year = today.getFullYear();
+  // const month = String(today.getMonth()).padStart(2, "0"); // Month is 0-indexed
+  // const maxMonth = `${year}-${month}`;
   const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth()).padStart(2, "0"); // Month is 0-indexed
-  const maxMonth = `${year}-${month}`;
+  const currentMonth = today.getMonth() + 1; // 1-12
+  const currentYear = today.getFullYear();
+
+  // Max month = previous month
+  const maxMonth = () => {
+    let year = currentYear;
+    let month = currentMonth - 1; // previous month
+
+    if (month === 0) { // January -> December previous year
+      month = 12;
+      year -= 1;
+    }
+
+    return `${year}-${month.toString().padStart(2, "0")}`; // YYYY-MM
+  };
 
   const handleDownload = async () => {
     if (!date) {
@@ -51,7 +67,7 @@ export default function EmpSalarySlip() {
           type="month"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          max={maxMonth}
+          max={maxMonth()}
           className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         />
       </div>

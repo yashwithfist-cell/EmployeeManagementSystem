@@ -3,12 +3,17 @@ package com.pmtool.backend.controller;
 import com.pmtool.backend.DTO.CreateEmployeeDTO;
 import com.pmtool.backend.DTO.EmployeeResponseDTO;
 import com.pmtool.backend.DTO.UpdateEmployeeDTO;
+import com.pmtool.backend.DTO.response.ApiResponse;
 import com.pmtool.backend.enums.Role;
 import com.pmtool.backend.services.EmployeeService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -66,5 +71,13 @@ public class EmployeeController {
 	@PreAuthorize("hasAnyRole('PROJECT_MANAGER','TEAM_LEAD','EMPLOYEE','SYSTEM_ADMIN','HUMAN_RESOURCE')")
 	public List<EmployeeResponseDTO> getAllManagers(@PathVariable Role role) {
 		return employeeService.getManagersByRole(role);
+	}
+
+	@GetMapping("/getEmployee")
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	public ResponseEntity<ApiResponse> getEmployeeByUsername(Authentication authentication,
+			HttpServletRequest request) {
+		return ResponseEntity.ok(ApiResponse.success(employeeService.getEmployeeByUsername(authentication.getName()),
+				"Employee Data Fetched Successfully", request.getRequestURI()));
 	}
 }

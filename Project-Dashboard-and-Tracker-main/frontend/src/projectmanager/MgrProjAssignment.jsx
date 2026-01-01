@@ -29,6 +29,10 @@ export default function MgrProjAssignment() {
   const [teamleadAssignments, setTeamleadAssignments] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
 
+  const [headComments, setHeadComments] = useState({});
+
+  const [isApproved, setIsApproved] = useState(false);
+
   const assignmentsRef = useRef([]);
   const sleepLockRef = useRef(false);
   const sleepPausedIdsRef = useRef(new Set());
@@ -352,6 +356,48 @@ export default function MgrProjAssignment() {
     setDueDate(null);
   };
 
+  const headAction = async (id, taskStatus) => {
+    const comment = headComments[id]?.trim();
+
+    if (!comment) {
+      alert("Please enter a comment before approving or rejecting.");
+      return;
+    }
+
+    try {
+      const res = await api.patch(`/assignment/updateHeadStatus/${id}`, {
+        taskStatus,
+        headComment: comment
+      });
+
+      const updated = res.data.data;
+
+      // Update assignments state
+      setAssignments(prev =>
+        prev.map(a =>
+          a.id === id
+            ? {
+              ...a,
+              taskStatus: updated.taskStatus,
+              headComment: updated.headComment,
+              finalized: updated.finalized
+            }
+            : a
+        )
+      );
+
+      // Clear per-row comment
+      setHeadComments(prev => ({
+        ...prev,
+        [id]: ""
+      }));
+
+    } catch (e) {
+      console.error(e);
+      alert("Error while updating approve/reject action");
+    }
+  };
+
   return (
     <div className="p-6">
       <h1 className="text-4xl font-extrabold mb-8 flex items-center gap-4 text-indigo-600 drop-shadow-sm">
@@ -485,6 +531,8 @@ export default function MgrProjAssignment() {
                 <th className="p-3 text-center font-semibold">Due Date</th>
                 <th className="p-3 text-center font-semibold">Time Spent</th>
                 <th className="p-3 text-center font-semibold">Status</th>
+                <th className="p-3 text-center font-semibold">Approve/Reject</th>
+                <th className="p-3 text-center font-semibold">Comments</th>
               </tr>
             </thead>
             <tbody>
@@ -517,7 +565,7 @@ export default function MgrProjAssignment() {
                     <select
                       className="border p-2 rounded bg-gray-50 mt-2"
                       value={a.status}
-                      disabled={updatingId === a.id}
+                      disabled={updatingId === a.id || a.finalized}
                       onChange={(e) => updateStatus(a.id, e.target.value)}
                     >
                       {STATUS_OPTIONS.map((s) => (
@@ -534,6 +582,11 @@ export default function MgrProjAssignment() {
                       </div>
                     )}
                   </td>
+                  <td className="p-2 text-center"><span className={`px-2 py-1 rounded-lg text-xs font-semibold 
+      ${a.taskStatus.startsWith("APPROVED") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                    {a.taskStatus.replaceAll("_", " ")}
+                  </span></td>
+                  <td className="p-2 text-center">{a.headComment}</td>
                 </tr>
               ))}
             </tbody>
@@ -555,6 +608,11 @@ export default function MgrProjAssignment() {
             <th className="p-3 text-center font-semibold">Time Spent</th>
             <th className="p-3 text-center font-semibold">Status</th>
             <th className="p-3 text-center font-semibold">Actions</th>
+            {assignments.some(a => a.status === "COMPLETED") && (
+              <th className="p-3 text-center font-semibold">
+                Approve/Reject
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -579,18 +637,46 @@ export default function MgrProjAssignment() {
                 {formatTime(a.totalWorkedSeconds)}
               </td>
               <td className="p-2 text-center"><span
-                className={`px-4 py-1 rounded-full text-xs font-bold shadow-sm ${statusColors[a.status]}`}
+                className={`px-1 py-1 rounded-full text-xs font-bold shadow-sm ${statusColors[a.status]}`}
               >
                 {a.status.replace("_", " ")}
               </span></td>
-              <td className="p-2 flex gap-3 justify-center">
-                <button className="text-blue-600 hover:bg-blue-100 p-2 rounded-lg transition" onClick={() => handleEdit(a)}>
+              <td className="p-2 text-center">
+                <button className="text-blue-600 hover:bg-blue-100 p-2 rounded-lg transition" onClick={() => handleEdit(a)} disabled={a.finalized}>
                   <Edit size={20} />
                 </button>
                 <button className="text-red-600 hover:bg-red-100 p-2 rounded-lg transition" onClick={() => handleDelete(a.id)}>
                   <Trash2 size={20} />
                 </button>
               </td>
+              {(a.status === "COMPLETED" && !a.finalized) &&
+                <td className="p-2 text-center">
+                  <textarea
+                    className="w-full border rounded"
+                    rows="2"
+                    placeholder="Enter action description..."
+                    value={headComments[a.id] || ""}
+                    onChange={(e) =>
+                      setHeadComments(prev => ({
+                        ...prev,
+                        [a.id]: e.target.value
+                      }))
+                    }
+                  />
+                  <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-sm transition-all duration-200" onClick={() => headAction(a.id, `APPROVED_BY_${role}`)}>
+                    Approve
+                  </button>
+                  <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-sm transition-all duration-200" onClick={() => headAction(a.id, `REJECTED_BY_${role}`)}>
+                    Reject
+                  </button>
+                </td>
+              }
+              {a.finalized && <td className="p-2 text-center">
+                <span className={`px-2 py-1 rounded-lg text-xs font-semibold 
+      ${a.taskStatus.startsWith("APPROVED") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                  {a.taskStatus.replaceAll("_", " ")}
+                </span>
+              </td>}
             </tr>
           ))}
         </tbody>

@@ -61,79 +61,79 @@ export default function EmpProjAssignment() {
   }, [assignments]);
 
   // 💤 AUTO-PAUSE ON PC SLEEP
-useEffect(() => {
-  let last = Date.now();
-  let mounted = true; // safety flag
+  useEffect(() => {
+    let last = Date.now();
+    let mounted = true; // safety flag
 
-  const pauseTimers = async () => {
-    const inProgress = assignmentsRef.current.filter(
-      (a) => a.status === "IN_PROGRESS" && a.timerRunning
-    );
+    const pauseTimers = async () => {
+      const inProgress = assignmentsRef.current.filter(
+        (a) => a.status === "IN_PROGRESS" && a.timerRunning
+      );
 
-    for (const a of inProgress) {
-      sleepPausedIdsRef.current.add(a.id);
-      try {
-        await api.patch(`/assignment/pauseTimer/${a.id}`, {}, { withCredentials: true });
-      } catch (e) {
-        console.error("Pause failed", a.id, e);
+      for (const a of inProgress) {
+        sleepPausedIdsRef.current.add(a.id);
+        try {
+          await api.patch(`/assignment/pauseTimer/${a.id}`, {}, { withCredentials: true });
+        } catch (e) {
+          console.error("Pause failed", a.id, e);
+        }
       }
-    }
-  };
+    };
 
-  const resumeTimers = async () => {
-    for (const id of sleepPausedIdsRef.current) {
-      try {
-        await api.patch(`/assignment/startTimer/${id}`, {}, { withCredentials: true });
-      } catch (e) {
-        console.error("Resume failed", id, e);
+    const resumeTimers = async () => {
+      for (const id of sleepPausedIdsRef.current) {
+        try {
+          await api.patch(`/assignment/startTimer/${id}`, {}, { withCredentials: true });
+        } catch (e) {
+          console.error("Resume failed", id, e);
+        }
       }
-    }
 
-    sleepPausedIdsRef.current.clear();
-    sleepLockRef.current = false;
-  };
+      sleepPausedIdsRef.current.clear();
+      sleepLockRef.current = false;
+    };
 
-  const interval = setInterval(async () => {
-    if (!mounted) return;
+    const interval = setInterval(async () => {
+      if (!mounted) return;
 
-    const now = Date.now();
-    const diff = now - last;
+      const now = Date.now();
+      const diff = now - last;
 
-    // 💤 PC SLEEP detected
-    if (diff > 20000 && !sleepLockRef.current) {
-      console.log("💤 PC SLEEP detected");
-      sleepLockRef.current = true;
-      await pauseTimers();
-    }
+      // 💤 PC SLEEP detected
+      if (diff > 20000 && !sleepLockRef.current) {
+        console.log("💤 PC SLEEP detected");
+        sleepLockRef.current = true;
+        await pauseTimers();
+      }
 
-    last = now;
-  }, 5000);
+      last = now;
+    }, 5000);
 
-  const onVisibilityChange = async () => {
-    if (!mounted) return;
+    const onVisibilityChange = async () => {
+      if (!mounted) return;
 
-    // 🔒 PC LOCK / TAB HIDDEN
-    if (document.hidden && !sleepLockRef.current) {
-      console.log("🔒 PC LOCK detected → pausing timers");
-      sleepLockRef.current = true;
-      await pauseTimers();
-    }
+      // 🔒 PC LOCK / TAB HIDDEN
+      if (document.hidden && !sleepLockRef.current) {
+        console.log("🔒 PC LOCK detected → pausing timers");
+        sleepLockRef.current = true;
+        await pauseTimers();
+      }
 
-    // 🔓 PC UNLOCK / WAKE → AUTO RESUME
-    if (!document.hidden && sleepPausedIdsRef.current.size > 0) {
-      console.log("🔓 PC UNLOCK → auto resume");
-      await resumeTimers();
-    }
-  };
+      // 🔓 PC UNLOCK / WAKE → AUTO RESUME
+      if (!document.hidden && sleepPausedIdsRef.current.size > 0) {
+        console.log("🔓 PC UNLOCK → auto resume");
+        await resumeTimers();
+      }
+    };
 
-  document.addEventListener("visibilitychange", onVisibilityChange);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
-  return () => {
-    mounted = false;
-    clearInterval(interval);
-    document.removeEventListener("visibilitychange", onVisibilityChange);
-  };
-}, []);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, []);
 
   const updateStatus = async (id, newStatus) => {
     try {
@@ -186,6 +186,8 @@ useEffect(() => {
                 <th className="p-2">Due Date</th>
                 <th className="p-2">Time Spent</th>
                 <th className="p-2">Status</th>
+                <th className="p-2">Approve/Reject</th>
+                <th className="p-2">Comments</th>
               </tr>
             </thead>
 
@@ -221,7 +223,7 @@ useEffect(() => {
                       <select
                         className="border p-2 rounded bg-gray-50 mt-2"
                         value={a.status}
-                        disabled={updatingId === a.id}
+                        disabled={updatingId === a.id || a.finalized}
                         onChange={(e) => updateStatus(a.id, e.target.value)}
                       >
                         {STATUS_OPTIONS.map((s) => (
@@ -238,6 +240,11 @@ useEffect(() => {
                         </div>
                       )}
                     </td>
+                    <td className="p-2 text-center"><span className={`px-2 py-1 rounded-lg text-xs font-semibold 
+      ${a.taskStatus.startsWith("APPROVED") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                      {a.taskStatus.replaceAll("_", " ")}
+                    </span></td>
+                    <td className="p-2 text-center">{a.headComment}</td>
                   </tr>
                 ))
               )}

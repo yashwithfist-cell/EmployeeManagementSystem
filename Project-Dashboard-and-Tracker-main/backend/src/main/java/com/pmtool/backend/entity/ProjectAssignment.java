@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pmtool.backend.enums.AssignmentStatus;
+import com.pmtool.backend.enums.TaskStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,11 +50,11 @@ public class ProjectAssignment {
 	private Project project;
 
 	@ManyToOne
-	@JoinColumn(name = "milestone_id",referencedColumnName = "id")
+	@JoinColumn(name = "milestone_id", referencedColumnName = "id")
 	private Milestone milestone;
 
 	@ManyToOne
-	@JoinColumn(name = "discipline_id",referencedColumnName = "id")
+	@JoinColumn(name = "discipline_id", referencedColumnName = "id")
 	private Discipline discipline;
 
 	@Column(name = "start_date")
@@ -79,5 +80,15 @@ public class ProjectAssignment {
 
 	@Column(name = "time_running", nullable = false)
 	private boolean timerRunning = false;
+
+	@Column(name = "head_status", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private TaskStatus headStatus = TaskStatus.PENDING;
+
+	@Column(name = "head_comment")
+	private String headComment;
+
+	@Column(name = "finalized")
+	private Boolean finalized = false;
 
 }

@@ -23,6 +23,7 @@ import com.pmtool.backend.entity.Milestone;
 import com.pmtool.backend.entity.Project;
 import com.pmtool.backend.entity.ProjectAssignment;
 import com.pmtool.backend.enums.AssignmentStatus;
+import com.pmtool.backend.enums.TaskStatus;
 import com.pmtool.backend.exception.ResourceNotFoundException;
 import com.pmtool.backend.repository.DisciplineRepository;
 import com.pmtool.backend.repository.EmployeeRepository;
@@ -221,5 +222,20 @@ public class ProjectAssignmentServiceImpl implements ProjectAssignmentService {
 
 		ProjectAssignment resultAssign = projectAssignmentRepo.save(pa);
 		return ProjectAssignmentResponse.fromEntity(resultAssign);
+	}
+
+	@Override
+	public ProjectAssignmentResponse updateHeadStatus(Long id, TaskStatus status, String comment) {
+		ProjectAssignment projassignment = projectAssignmentRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
+		projassignment.setHeadStatus(status);
+		projassignment.setHeadComment(comment);
+		if (status.toString().startsWith("APPROVED")) {
+			projassignment.setFinalized(true);
+		}
+		ProjectAssignment resultAssign = projectAssignmentRepo.save(projassignment);
+		return ProjectAssignmentResponse.builder().id(resultAssign.getProjAssignId())
+				.taskStatus(resultAssign.getHeadStatus()).headComment(resultAssign.getHeadComment())
+				.finalized(resultAssign.getFinalized()).build();
 	}
 }

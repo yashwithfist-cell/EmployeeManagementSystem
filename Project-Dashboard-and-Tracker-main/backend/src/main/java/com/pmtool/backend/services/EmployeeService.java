@@ -5,6 +5,7 @@ import com.pmtool.backend.DTO.EmployeeResponseDTO;
 import com.pmtool.backend.entity.Department;
 import com.pmtool.backend.entity.Employee;
 import com.pmtool.backend.enums.Role;
+import com.pmtool.backend.exception.EmployeeNotFoundException;
 import com.pmtool.backend.repository.DepartmentRepository;
 import com.pmtool.backend.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +108,11 @@ public class EmployeeService {
 		return employeeList.stream()
 				.map(emp -> EmployeeResponseDTO.builder().employeeId(emp.getEmployeeId()).name(emp.getName()).build())
 				.toList();
+	}
+
+	public EmployeeResponseDTO getEmployeeByUsername(String name) {
+		Employee employee = employeeRepository.findByUsername(name).orElseThrow(()->new EmployeeNotFoundException("Employee Not Found with username : "+name));
+		return new EmployeeResponseDTO(employee);
 	}
 
 }
