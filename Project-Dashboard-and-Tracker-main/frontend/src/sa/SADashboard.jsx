@@ -57,11 +57,11 @@ const SADashboard = () => {
             <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <StatCard title="Total Projects" value={stats?.totalProjects || 0} color="border-blue-500" />
                 <StatCard title="Total Employees" value={stats?.totalEmployees || 0} color="border-green-500" />
                 <StatCard title="Total Departments" value={stats?.totalDepartments || 0} color="border-purple-500" />
-                <StatCard title="Total Milestones" value={stats?.totalMilestones || 0} color="border-yellow-500" />
+                {/* <StatCard title="Total Milestones" value={stats?.totalMilestones || 0} color="border-yellow-500" /> */}
             </div>
 
             {/* Charts Section */}
